@@ -469,7 +469,12 @@ class babbler1900():
             )
             # Just the actual character prediction
             pred_int = seed_samples[0, -1] + 1
-            seed = seed + int_to_aa[pred_int]
+            aa = int_to_aa[pred_int]
+            if aa == "stop":
+                return seed
+            else:
+                seed = seed + aa
+                #seed = seed + int_to_aa[pred_int]
         
             for i in range(length - len(seed)):
                 pred_int, final_state_ = sess.run(
@@ -482,8 +487,13 @@ class babbler1900():
                     }
                 )
                 pred_int = pred_int[0, 0] + 1
-                seed = seed + int_to_aa[pred_int]
-        return seed        
+                aa = int_to_aa[pred_int]
+                if aa == "stop":
+                    break
+                else:
+                    seed = seed + aa
+                #seed = seed + int_to_aa[pred_int]
+        return seed
 
     def get_all_hiddens(self, seq_list, sess, return_logits=False):
         """
@@ -578,8 +588,8 @@ class babbler1900():
         for v in vs:
             name = v.name
             value = sess.run(v)
-            print(name)
-            print(value)
+            # print(name)
+            # print(value)
             np.save(os.path.join(dir_name,name.replace('/', '_') + ".npy"), np.array(value))
             
     def dump_checkpoint_weights(self, restore_path, dir_name):
